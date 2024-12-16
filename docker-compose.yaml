@@ -1,0 +1,49 @@
+services:
+  # Uncomment for local build
+  #  probation-app:
+  #    container_name: probation-app
+  #    build:
+  #      context: .
+  #      dockerfile: Dockerfile
+  #    env_file:
+  #      - .env
+  #    ports:
+  #      - '3000:3000'
+  #    networks:
+  #      - probation-network
+  #    depends_on:
+  #      - database
+  #      - redis
+
+  database:
+    container_name: database
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - '${DB_PORT}:5432'
+    volumes:
+      - probation__pg_data:/var/lib/postgresql/data
+    networks:
+      - probation-network
+
+  redis:
+    container_name: redis
+    image: redis:7.4.1-alpine
+    ports:
+      - '${REDIS_PORT}:6379'
+    volumes:
+      - redis_data:/data
+    # enable AOF due of absence of cluster mode
+    command: ['redis-server', '--appendonly', 'yes']
+    networks:
+      - probation-network
+
+volumes:
+  probation__pg_data:
+  redis_data:
+
+networks:
+  probation-network:

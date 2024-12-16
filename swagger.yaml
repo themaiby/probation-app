@@ -1,0 +1,156 @@
+openapi: 3.0.0
+paths:
+  /api/campaign-reports:
+    get:
+      operationId: CampaignReportsController_getAggregated
+      parameters:
+        - name: fromDate
+          required: true
+          in: query
+          schema:
+            format: date-time
+            type: string
+        - name: toDate
+          required: true
+          in: query
+          schema:
+            format: date-time
+            type: string
+        - name: eventName
+          required: true
+          in: query
+          schema:
+            enum:
+              - install
+              - purchase
+            type: string
+        - name: page
+          required: false
+          in: query
+          schema:
+            minimum: 1
+            default: 1
+            type: number
+        - name: limit
+          required: false
+          in: query
+          schema:
+            minimum: 1
+            maximum: 100
+            default: 5
+            type: number
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/CampaignReportsAggregateResponse"
+                      meta:
+                        $ref: "#/components/schemas/MetaResource"
+      tags: &a1
+        - campaign-reports
+  /api/campaign-reports/actions/trigger-fetch:
+    post:
+      operationId: CampaignReportsController_triggerFetch
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CampaignReportsTriggerFetchQuery"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/CampaignReportsTriggerFetchResponse"
+      tags: *a1
+info:
+  title: probation-app
+  description: ""
+  version: 1.0.0
+  contact: {}
+tags: []
+servers: []
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+  schemas:
+    MetaResource:
+      type: object
+      properties:
+        limit:
+          type: number
+          description: Items limit per page
+          example: 10
+        currentPage:
+          type: number
+          description: Number of current page
+          example: 1
+        lastPage:
+          type: number
+          description: Number of last page
+          example: 10
+        currentCount:
+          type: number
+          description: Items count on current page
+          example: 5
+        totalCount:
+          type: number
+          description: Items count in total
+          example: 100
+      required:
+        - limit
+        - currentPage
+        - lastPage
+        - currentCount
+        - totalCount
+    CampaignReportsAggregateResponse:
+      type: object
+      properties:
+        adId:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date-time
+        eventCount:
+          type: number
+      required:
+        - adId
+        - date
+        - eventCount
+    CampaignReportsTriggerFetchResponse:
+      type: object
+      properties:
+        processed:
+          type: number
+          description: Count of processed campaign reports (inserted and skipped)
+      required:
+        - processed
+    CampaignReportsTriggerFetchQuery:
+      type: object
+      properties:
+        fromDate:
+          type: string
+          format: date-time
+        toDate:
+          type: string
+          format: date-time
+      required:
+        - fromDate
+        - toDate
