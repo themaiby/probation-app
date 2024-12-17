@@ -2,6 +2,9 @@ import { applyDecorators, HttpStatus, Type } from '@nestjs/common';
 import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 import { MetaResource } from '../resources/meta.resource';
 
+/**
+* Decorators for wrapping data and metadata in documentation examples
+**/
 export const ApiOkPaginationResponse = <TModel extends Type>(model: TModel, status: HttpStatus = HttpStatus.OK) => {
   return applyDecorators(
     ApiExtraModels(MetaResource, model),
